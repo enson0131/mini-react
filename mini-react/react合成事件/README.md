@@ -7,7 +7,7 @@ React17 之前, 合成事件是在 document 冒泡时触发
 
 
 # 原生事件和合成事件的执行顺序是什么？
-React16: document 捕获 -> 原生事件 -> 合成事件 -> document 冒泡 (原因是事件委托在 document 的冒泡时间上)
+React16: document 捕获 -> 原生事件 -> 合成事件 -> document 冒泡 (原因是事件委托在 document 的冒泡事件上)
 React17: document 捕获 -> 合成捕获 -> 原生捕获 -> 原生冒泡 -> 合成冒泡 -> document 冒泡 (原因是合成事件的委托在 root 容器的捕获和冒泡事件上了)
 
 # 合成事件在什么阶段会被执行？

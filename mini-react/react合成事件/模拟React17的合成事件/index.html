@@ -20,7 +20,7 @@
         */
         (() => {
             /*
-                收集事件，根据事件类型执行
+               收集事件，根据事件类型执行
             */
             function dispatchEvent(event, useCapture) {
                 const paths = [];
@@ -77,16 +77,16 @@
 
             // 模拟合成事件 start
             parent.onClick = () => {
-                console.log(`【react 事件】parent 元素合成冒泡事件触发`);
+                console.log(`【react事件】parent 元素合成冒泡事件触发`);
             }
             parent.onClickCapture = () => {
-                console.log(`【react 事件】parent 元素合成捕获事件触发`);
+                console.log(`【react事件】parent 元素合成捕获事件触发`);
             }
             children.onClick = () => {
-                console.log(`【react 事件】children 元素合成冒泡事件触发`);
+                console.log(`【react事件】children 元素合成冒泡事件触发`);
             }
             children.onClickCapture = () => {
-                console.log(`【react 事件】children 元素合成捕获事件触发`);
+                console.log(`【react事件】children 元素合成捕获事件触发`);
             }
             // 模拟合成事件 end
         })()

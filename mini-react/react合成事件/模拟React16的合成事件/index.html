@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模拟React16的合成事件</title>
+</head>
+<body>
+    <div id="root">
+        <div id="parent">
+            <div id="children">子元素</div>
+        </div>
+    </div>
+    <script>
+        /*
+            思路: 收集所有的合成事件，在捕获节点执行合成事件的捕获与冒泡
+        */
+        function dispatchEvent (event) {
+            const paths = [];
+            let current = event.target;
+
+            while(current) {
+                paths.push(current)
+                current = current.parentNode;
+            }
+            
+            // 捕获阶段
+            for(let i = paths.length - 1; i >= 0; i--) {
+                const handler = paths[i].onClickCapture;
+                handler && handler();
+            }
+
+            // 冒泡阶段
+            for(let j = 0; j < paths.length; j++) {
+                const handler = paths[j].onClick;
+                handler && handler();
+            }
+        }
+
+        const parent = document.getElementById('parent');
+        const children = document.getElementById('children');
+        document.addEventListener('click', (e) => dispatchEvent(e)); // React16 合成事件在 document 的冒泡事件上出发
+        // 原生事件 start
+        document.addEventListener('click', () => {
+            console.log(`【原生事件】document 元素原生冒泡事件触发`);
+        });
+        document.addEventListener('click', () => {
+            console.log(`【原生事件】document 元素原生捕获事件触发`);
+        }, true);
+
+        parent.addEventListener('click', () => {
+            console.log(`【原生事件】parent 元素原生冒泡事件触发`);
+        });
+        parent.addEventListener('click', () => {
+            console.log(`【原生事件】parent 元素原生捕获事件触发`);
+        }, true);
+
+        children.addEventListener('click', () => {
+            console.log(`【原生事件】children 元素原生冒泡事件触发`);
+        });
+        children.addEventListener('click', () => {
+            console.log(`【原生事件】children 元素原生捕获事件触发`);
+        }, true);
+        // 原生事件 end
+
+        // 模拟合成事件 start
+        parent.onClick = () => {
+            console.log(`【react事件】parent 元素合成冒泡事件触发`);
+        }
+        parent.onClickCapture = () => {
+            console.log(`【react事件】parent 元素合成捕获事件触发`);
+        }
+        children.onClick = () => {
+            console.log(`【react事件】children 元素合成冒泡事件触发`);
+        }
+        children.onClickCapture = () => {
+            console.log(`【react事件】children 元素合成捕获事件触发`);
+        }
+        // 模拟合成事件 end
+    </script>
+</body>
+</html>

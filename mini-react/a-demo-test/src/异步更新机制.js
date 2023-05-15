@@ -6,7 +6,6 @@ import { useState } from 'react';
 
 const reducer = (state, action) => {
     return action
-
 }
 
 /**

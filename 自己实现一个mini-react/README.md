@@ -15,4 +15,10 @@ const element = {
 
 为了把所有的任务单元组织起来，我们需要一个数据结构: Fiber 结构
 
+3 在 performUnitOfWork 方法中，如果一边生成新的 DOM 并添加到其父节点上, 在整颗树的渲染前，浏览器还要中途阻断这个过程，用户有可能看到渲染未完全的 UI，
+因此我们将修改DOM 这部分的内容记录在 Fiber tree 上, 通过最终这颗 Fiber tree 来收集所有的 DOM 节点的修改，这个树叫做 wipRoot(work in progress root); 
+一旦 wipRoot 完成了所有的任务，我们就会将这颗树的变更提交到实际的 DOM 上。（这个提交操作都在 commitRoot 函数中完成）
+
+
+
 

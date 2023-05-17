@@ -57,41 +57,81 @@ function createTextElement(text) {
 // }
 
 // requestIdleCallback + Fiber 架构 start
-let nextUnitOfWork = null
-function createDom(fiber) {}
+let nextUnitOfWork = null;
+let wipRoot = null;
+function createDom(fiber) {
+
+}
 
 function render(element, container) {
     // 将 nextUnitOfWork 作为 Fiber 树的根节点
-    nextUnitOfWork = {
-        dom: container,
+    wipRoot = { // 为了避免在边操作树边渲染树，因UI阻塞导致页面不完全，因此采用了将操作DOM的记录存储到 wipRoot 上, 最终在修改成 DOM 树
+        dom: container, 
         props: {
             children: [element]
         }
     }
+
+    nextUnitOfWork = wipRoot;
+}
+
+/**
+ * 根据 Fiber 节点渲染 DOM 树
+ */
+function commitRoot () {
+    commitWork(wipRoot.child);
+    wipRoot = null;
+}
+
+/**
+ * 递归渲染 Fiber 节点
+ * @param {*} fiber 
+ */
+function commitWork(fiber) {
+    if (!fiber) return;
+
+    const domParent = fiber.parent.dom;
+    domParent.appendChild(fiber.dom);
+    commitWork(fiber.child);
+    commitWork(fiber.sibling);
 }
 
 function workLoop(deadline) {
-    let shouldYield = false
+    let shouldYield = false;
+    // 循环构建 Fiber 树
     while (nextUnitOfWork && !shouldYield) {
       nextUnitOfWork = performUnitOfWork(
         nextUnitOfWork
       )
-      shouldYield = deadline.timeRemaining() < 1
+      shouldYield = deadline.timeRemaining() < 1; // 判断是否需要中断
     }
+
+    if (!nextUnitOfWork && wipRoot) {
+        // 构建完 Fiber 树了, 将 Fiber 树的数据构建 DOM 树
+        commitRoot();
+    }
+    
+    
+
     requestIdleCallback(workLoop)
 }
 
 requestIdleCallback(workLoop)
 
+/**
+ * 根据 Fiber 数据，构建 Fiber 树
+ * @param {*} fiber 
+ * @returns 
+ */
 function performUnitOfWork(fiber) {
     // add dom node
     if (!fiber.dom) {
         fiber.dom = createDom(fiber);
     }
 
-    if (fiber.parent) {
-        fiber.parent.dom.appendChild(fiber.dom);
-    }
+    // if (fiber.parent) {
+    //     fiber.parent.dom.appendChild(fiber.dom);
+    // }
     // create new fibers
     const elements = fiber.props.children;
     let index = 0;

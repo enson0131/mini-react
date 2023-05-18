@@ -57,8 +57,14 @@ function createTextElement(text) {
 // }
 
 // requestIdleCallback + Fiber 架构 start
-let nextUnitOfWork = null;
-let wipRoot = null;
+let nextUnitOfWork = null; // Fiber节点
+let wipRoot = null; // Fiber 树
+let currentRoot = null; // 当前的 Fiber 树的根节点
+
+/**
+ * 根据 Fiber 创建
+ * @param {*} fiber 
+ */
 function createDom(fiber) {
 
 }
@@ -69,7 +75,8 @@ function render(element, container) {
         dom: container, 
         props: {
             children: [element]
-        }
+        },
+        alternate: currentRoot, // 记录旧的 Fiber 节点引用
     }
 
     nextUnitOfWork = wipRoot;
@@ -80,6 +87,7 @@ function render(element, container) {
  */
 function commitRoot () {
     commitWork(wipRoot.child);
+    currentRoot = wipRoot;
     wipRoot = null;
 }
 
@@ -110,13 +118,56 @@ function workLoop(deadline) {
         // 构建完 Fiber 树了, 将 Fiber 树的数据构建 DOM 树
         commitRoot();
     }
-    
-    
 
     requestIdleCallback(workLoop)
 }
 
 requestIdleCallback(workLoop)
+
+
+/**
+ * 根据 React 虚拟 子DOM 创建 Fiber 节点, 并构建 子 Fiber 树
+ * 该函数还会调和旧的 Fiber 节点和新的 React element
+ * @param {*} wipFiber 
+ * @param {*} elements 
+ */
+function reconcileChildren(wipFiber, elements) {
+    let index = 0;
+    let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
+    let prevSibling = null;
+
+    while(index < elements.length || !oldFiber) {
+        const element = elements[index];
+
+        const newFiber = {
+            type: element.type,
+            props: element.props,
+            parent: wipFiber,
+            dom: null,
+        }
+
+        // TODO compare oldFiber to element
+        /*
+        通过比较旧的Fiber 节点和新的 React element 对象进行复用
+        1 对于新旧类型是相同的情况, 我们可以复用旧的DOM, 仅修改上面的书写
+        2 如果类型不同, 意味着我们需要创建一个新的 DOM 节点，并且旧节点存在的话, 需要把旧节点移除
+        */
+
+
+        if (oldFiber) {
+            oldFiber = oldFiber.sibling;
+        }
+
+        if (index === 0) { // 第一个子节点
+            wipFiber.child = newFiber;
+        } else {
+            prevSibling.sibling = newFiber;
+        }
+
+        prevSibling = newFiber;
+        index++;
+    }
+}
 
 /**
  * 根据 Fiber 数据，构建 Fiber 树
@@ -134,28 +185,8 @@ function performUnitOfWork(fiber) {
     // }
     // create new fibers
     const elements = fiber.props.children;
-    let index = 0;
-    let prevSibling = null;
+    reconcileChildren(fiber, elements);
 
-    while(index < elements.length) {
-        const element = elements[index];
-
-        const newFiber = {
-            type: element.type,
-            props: element.props,
-            parent: fiber,
-            dom: null,
-        }
-
-        if (index === 0) { // 第一个子节点
-            fiber.child = newFiber;
-        } else {
-            prevSibling.sibling = newFiber;
-        }
-
-        prevSibling = newFiber;
-        index++;
-    }
     // 返回下一个要执行的 fiber 节点
     if (fiber.child) {
         return fiber.child;

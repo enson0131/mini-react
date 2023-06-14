@@ -15,7 +15,12 @@
             type: "h1",
             props: {
                 innerHTML: "foo",
-                children: "Hello",
+                children: [{
+                    type: "h2",
+                    props: {
+                        innerHTML: "bar",
+                    }
+                }],
             },
         }
         

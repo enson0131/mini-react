@@ -66,7 +66,17 @@ let deletions = []; // 需要删除的旧的 Fiber 节点
  * @param {*} fiber 
  */
 function createDom(fiber) {
-
+    const dom =
+    fiber.type == "TEXT_ELEMENT"
+      ? document.createTextNode("")
+      : document.createElement(fiber.type)
+  const isProperty = key => key !== "children"
+  Object.keys(fiber.props)
+    .filter(isProperty)
+    .forEach(name => {
+      dom[name] = fiber.props[name]
+    })
+  return dom
 }
 
 function render(element, container) {
@@ -79,8 +89,8 @@ function render(element, container) {
         alternate: currentRoot, // 记录旧的 Fiber 节点引用
     }
 
-    deletions = [];
     nextUnitOfWork = wipRoot;
+    deletions = [];
 }
 
 /**
@@ -186,7 +196,7 @@ requestIdleCallback(workLoop)
  * @param {*} wipFiber 
  * @param {*} elements 
  */
-function reconcileChildren(wipFiber, elements) {
+function reconcileChildren(wipFiber, elements = []) {
     let index = 0;
     let oldFiber = wipFiber.alternate && wipFiber.alternate.child; // 上次渲染的 Fiber 节点
     let prevSibling = null;
@@ -268,9 +278,46 @@ function updateHostComponent (fiber) {
     reconcileChildren(fiber, fiber.props.children);
 }
 
+let wipFiber = null;
+let hookIndex = null;
 function updateFunctionComponent(fiber) {
+    wipFiber = fiber;
+    hookIndex = 0;
+    wipFiber.hooks = []; // 用于存储 hooks
     const children = [fiber.type(fiber.props)];
     reconcileChildren(fiber, children);
+}
+
+function useState(initial) {
+    const oldHook = wipFiber.alternate && wipFiber.alternate.hooks && wipFiber.alternate.hooks[hookIndex]; // 获取旧的 hook
+    const hook = {
+        state: oldHook ? oldHook.state : initial,
+        queue: []
+    }
+
+
+    const actions = oldHook ? oldHook.queue : [];
+    actions.forEach(action => { // 下一次执行函数组件的时候，就会执行 useState 就会执行setState时存入的 action
+        hook.state = action(hook.state);
+    })
+
+
+    const setState = action => {
+        hook.queue.push(action);
+        wipRoot = { // 设置当前的 Fiber 节点为根节点从根节点开始遍历 Fiber 树
+            dom: currentRoot.dom,
+            props: currentRoot.props,
+            alternate: currentRoot,
+        }
+        nextUnitOfWork = wipRoot;
+        deletions = [];
+    }
+
+
+    wipFiber.hooks.push(hook);
+    hookIndex++;
+
+    return [hook.state, setState];
 }
 
 

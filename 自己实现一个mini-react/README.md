@@ -19,6 +19,17 @@ const element = {
 因此我们将修改DOM 这部分的内容记录在 Fiber tree 上, 通过最终这颗 Fiber tree 来收集所有的 DOM 节点的修改，这个树叫做 wipRoot(work in progress root); 
 一旦 wipRoot 完成了所有的任务，我们就会将这颗树的变更提交到实际的 DOM 上。（这个提交操作都在 commitRoot 函数中完成）
 
+4 在更新整颗树的时候，需要构建新的 Fiber 节点，因此我们通过 alternate 记录旧的节点，通过新的element和旧的fiber节点的type的对比进行复用，生成新的fiber节点
+
+总体的遍历过程是先子节点在兄弟节点。
+
+
+
+# 函数组件
+1 函数组件的fiber节点是没有 DOM 节点的
+2 子节点是由函数运行而来，而不是直接从 props 属性中获取
+
+
 
 
 

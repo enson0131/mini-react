@@ -169,6 +169,12 @@ function updateDom(dom, prevProps, nextProps) {
     });
 }
 
+/**
+ * 构建 Fiber 树🌲
+ * Fiber Reconciler 的实现算法
+ * nextUnitOfWork - Fiber 根节点, FiberNode 类
+ * @param {*} deadline - 空闲时间
+ */
 function workLoop(deadline) {
     let shouldYield = false;
     // 循环构建 Fiber 树
@@ -323,6 +329,7 @@ function useState(initial) {
 
 /**
  * 根据 Fiber 数据，构建 Fiber 树
+ * 先深度遍历子节点，再遍历兄弟节点
  * @param {*} fiber 
  * @returns 
  */

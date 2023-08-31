@@ -208,6 +208,24 @@ function reconcileChildren(wipFiber, elements = []) {
     let prevSibling = null;
 
     while(index < elements.length || oldFiber != null) {
+        /**
+         这里应该是存在 单节点diff 和 多节点diff 的情况
+         - 如果是单节点diff
+           1 判断key和tag是否相同
+             - 如果不相同，则旧的 Fiber 节点标记成删除，继续遍历 Fiber 节点
+             - 如果相同，则复用 Fiber 节点，并更新属性
+        
+        - 如果是多节点diff会有俩个 for 循环，第一个 for 循环判断节点是否需要更新，第二个 for 循环判断是否需要删除、添加、移动节点
+           - 第一层 for 循环
+            1 判断 key 和 tag 是否相同, 相同则判断需要更新
+            2 如果是 key 相同 tag不相同，标记为删除，并继续遍历
+            3 如果 key 不相同，跳出循环, 记录上一个 key 相同的 index 索引 lastIndex
+           - 第二次 for 循环
+            1 建立旧节点的 Map 表，key 为 key, value 为 节点
+            2 判断新节点是否在 Map 表中存在, 如果对应的旧节点索引 oldIndex > lastIndex, 表示需要更新节点
+            3 如果 oldIndex < lastIndex, 表示需要更新移动节点
+            4 如果新节点的key不存在 Map 标中，直接新增节点
+         */
         const element = elements[index];
 
         let newFiber = null;

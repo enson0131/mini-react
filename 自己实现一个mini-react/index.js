@@ -175,6 +175,7 @@ function updateDom(dom, prevProps, nextProps) {
  * nextUnitOfWork - Fiber 根节点, FiberNode 类
  * @param {*} deadline - 空闲时间
  */
+
 function workLoop(deadline) {
     let shouldYield = false;
     // 循环构建 Fiber 树

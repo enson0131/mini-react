@@ -180,10 +180,10 @@ function dispatchUserBlockingUpdate(
 }
 
 export function dispatchEvent(
-  domEventName: DOMEventName,
-  eventSystemFlags: EventSystemFlags,
-  targetContainer: EventTarget,
-  nativeEvent: AnyNativeEvent,
+  domEventName: DOMEventName, // DOM 事件名称，如：click，不是onClick；
+  eventSystemFlags: EventSystemFlags, // 事件系统标记；
+  targetContainer: EventTarget, // id 为 root 的 div；
+  nativeEvent: AnyNativeEvent, // 原生事件对象；
 ): void {
   if (!_enabled) {
     return;

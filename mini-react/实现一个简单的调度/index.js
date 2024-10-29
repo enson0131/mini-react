@@ -3,7 +3,6 @@ const tasks = []; // 任务队列
 let isRunning = false; // 是否正在调度
 let startTime = 0; // 开始时间
 
-
 function addTask(callback) {
     const task = createTask(callback); // 创建任务
     tasks.push(task); // 将任务添加到任务队列
@@ -61,7 +60,7 @@ const workLoop = () => {
         const task = tasks.shift();
         task.callback();
     }
-
+ 
     if (tasks.length > 0) {
         scheduleWork();
     } else {
@@ -72,13 +71,7 @@ const workLoop = () => {
 const shouldYield = () => {
     return Date.now() >= startTime + yieldInterval;
 }
-
-
-
-
-
 // ------------------------ 使用 ------------------------------
-
 addTask(() => {
     console.log('task1')
 });

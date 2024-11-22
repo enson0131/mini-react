@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Frame</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+    <style>
+        #animation {
+            width: 30px;
+            height: 30px;
+            background: red;
+            animation: myfirst 5s infinite;
+        }
+
+        @keyframes myfirst {
+            from {
+                width: 30px;
+                height: 30px;
+                border-radius: 0;
+                background: red;
+            }
+
+            to {
+                width: 300px;
+                height: 300px;
+                border-radius: 50%;
+                background: yellow;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="animation"></div>
+</body>
+<script>
+    // function rafCallback(timestamp) {
+    //   window.requestAnimationFrame(rafCallback);
+    // }
+    // window.requestAnimationFrame(rafCallback);
+    // function rafCallback(timestamp) {
+    //     const start = new Date().getTime();
+    //     while (new Date().getTime() - start < 100) { } // change 2 to 100
+    //     window.requestAnimationFrame(rafCallback);
+    // }
+    // window.requestAnimationFrame(rafCallback);
+
+    // function timeoutCallback() {
+    //     const start = new Date().getTime();
+    //     while (new Date().getTime() - start < 2) {}
+    //     setTimeout(timeoutCallback, 0);
+    // }
+    // setTimeout(timeoutCallback, 0);
+
+    // var channel = new MessageChannel();
+    // var port1 = channel.port1;
+    // var port2 = channel.port2;
+    // port1.onmessage = work;
+    // function work() {
+    //     port2.postMessage(null);
+    // }
+    // port2.postMessage(null);
+
+    // const timeout = 1000;
+    // requestIdleCallback(workLoop, { timeout });
+    // function workLoop(deadline) {
+    //     while (deadline.timeRemaining() > 0 || deadline.didTimeout) { }
+    //     requestIdleCallback(workLoop, { timeout });
+    // }
+
+    let count = 0;
+    function mymicrotask() {
+        Promise.resolve(1).then((res) => {
+            // count++;
+            // if (count < 100000) {
+                mymicrotask();
+            // }
+        });
+    }
+    function rafCallback(timestamp) {
+        mymicrotask();
+        count = 0;
+        window.requestAnimationFrame(rafCallback);
+    }
+    window.requestAnimationFrame(rafCallback);
+</script>
+
+</html>
